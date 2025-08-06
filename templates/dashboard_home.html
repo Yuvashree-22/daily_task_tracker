@@ -1,14 +1,5 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>User Dashboard Home</title>
-    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
-    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
-    <meta name="theme-color" content="#2c3e50">
-</head>
-<body style="font-family: sans-serif; background: #f8f9fa; padding: 20px;">
+<!-- dashboard_home.html (final corrected version) -->
 
-<!-- templates/dashboard_home.html -->
 <h2>Welcome, {{ user.username }}!</h2>
 
 <div style="display: flex; gap: 40px; flex-wrap: wrap;">
@@ -64,32 +55,28 @@
         {% endfor %}
     </tbody>
 </table>
-</div>
 
-<!-- Chart.js Pie -->
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('taskChart').getContext('2d');
-    const taskChart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: ['Completed', 'Pending'],
-            datasets: [{
-                data: [{{ completed }}, {{ pending }}],
-                backgroundColor: ['#27ae60', '#e67e22']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false
+    window.onload = function () {
+        const canvas = document.getElementById('taskChart');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            const taskChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: ['Completed', 'Pending'],
+                    datasets: [{
+                        data: [{{ completed }}, {{ pending }}],
+                        backgroundColor: ['#27ae60', '#e67e22']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
         }
-    });
+    };
 </script>
-
-<script>
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('{{ url_for('static', filename='service-worker.js') }}')
-          .then(reg => console.log("✅ Service Worker registered."))
-          .catch(err => console.error("❌ Service Worker registration failed:", err));
-      }
-    </script>
