@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- PWA Meta Tags -->
+<link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+<meta name="theme-color" content="#2c3e50">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
+    <meta charset="UTF-8">
+    <title>Boss Dashboard</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f8;
+        }
+
+        h3 {
+            margin-top: 0;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Left Panel */
+        .left-panel {
+            width: 14%;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+        }
+
+        .left-panel h3 {
+            color: #ecf0f1;
+            margin-bottom: 10px;
+        }
+
+        .left-panel table {
+            width: 100%;
+            border-collapse: collapse;
+            color: #ecf0f1;
+            font-size: 14px;
+        }
+
+        .left-panel th, .left-panel td {
+            padding: 8px;
+            border: 1px solid #34495e;
+            text-align: left;
+        }
+
+        .left-panel th {
+            background-color: #34495e;
+        }
+
+        /* Right Panel */
+        .right-panel {
+            width: 86%;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        form label {
+            margin-right: 10px;
+            font-weight: 500;
+        }
+
+        form select, form input[type="date"], form input[type="month"] {
+            padding: 6px 10px;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        form button {
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #2980b9;
+        }
+
+        form a {
+            margin-left: 10px;
+            color: #c0392b;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        form a:hover {
+            text-decoration: underline;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        th {
+            background-color: #ecf0f1;
+            text-align: left;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .username-header {
+            background-color: #bdc3c7;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 30px;
+        }
+
+        .logout {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .logout a {
+            color: #e74c3c;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .logout a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- LEFT PANEL -->
+    <div class="left-panel">
+        <h3>Today's Field Status</h3>
+        <table>
+            <tr>
+                <th>User</th>
+                <th>Location</th>
+            </tr>
+            {% for entry in today_locations %}
+            <tr>
+                <td>{{ entry.username }}</td>
+                <td>{{ entry.location }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="right-panel">
+        <div class="card">
+            <!-- Filter Form -->
+            <form method="POST" id="filterForm">
+                <label>Filter by:</label>
+                <select name="filter_type" id="filterType" onchange="toggleFilterInput()">
+                    <option value="day">Day</option>
+                    <option value="month">Month</option>
+                    <option value="year">Year</option>
+                </select>
+
+                <input type="date" name="filter_day" id="filterDay">
+                <input type="month" name="filter_month" id="filterMonth" style="display:none;">
+                <select name="filter_year" id="filterYear" style="display:none;">
+                    {% for y in range(2022, 2031) %}
+                    <option value="{{ y }}">{{ y }}</option>
+                    {% endfor %}
+                </select>
+
+                <label>Client:</label>
+                <select name="filter_client">
+                    <option value="all">All</option>
+                    {% for client in clients %}
+                    <option value="{{ client }}">{{ client }}</option>
+                    {% endfor %}
+                </select>
+
+                <label>User:</label>
+                <select name="filter_user">
+                    <option value="all">All</option>
+                    {% for user in users %}
+                    <option value="{{ user }}">{{ user }}</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit">Apply Filter</button>
+                <a href="/boss/dashboard">Clear</a>
+            </form>
+        </div>
+
+        <!-- TASK TABLES -->
+        {% if user_tasks_map %}
+            {% for username, user_tasks in user_tasks_map.items() %}
+                <div class="card">
+                    <div class="username-header">
+                        <strong>{{ username }}</strong>
+                    </div>
+                    <table>
+                        <tr>
+                            <th>Date</th>
+                            <th>Task ID</th>
+                            <th>Description</th>
+                            <th>Client/Site</th>
+                            <th>Status</th>
+                        </tr>
+                        {% for task in user_tasks %}
+                        <tr>
+                            <td>{{ task.date }}</td>
+                            <td>{{ task.task_id }}</td>
+                            <td>{{ task.description }}</td>
+                            <td>{{ task.client }}</td>
+                            <td>{{ task.status }}</td>
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="card">
+                <p style="text-align: center;">No tasks to show.</p>
+            </div>
+        {% endif %}
+
+        <div class="logout">
+            <a href="/boss/logout">Logout</a>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleFilterInput() {
+        const type = document.getElementById('filterType').value;
+        document.getElementById('filterDay').style.display = (type === 'day') ? 'inline' : 'none';
+        document.getElementById('filterMonth').style.display = (type === 'month') ? 'inline' : 'none';
+        document.getElementById('filterYear').style.display = (type === 'year') ? 'inline' : 'none';
+    }
+</script>
+
+<!-- Register Service Worker -->
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/static/service-worker.js')
+      .then(reg => console.log('Service Worker Registered'))
+      .catch(err => console.error('Service Worker registration failed:', err));
+  }
+</script>
+
+</body>
+</html>

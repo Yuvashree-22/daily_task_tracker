@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Dashboard Home</title>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192.png') }}">
+    <meta name="theme-color" content="#2c3e50">
+</head>
+<body style="font-family: sans-serif; background: #f8f9fa; padding: 20px;">
+
+<!-- templates/dashboard_home.html -->
+<h2>Welcome, {{ user.username }}!</h2>
+
+<div style="display: flex; gap: 40px; flex-wrap: wrap;">
+    <!-- Pie Chart -->
+    <div style="flex: 1; min-width: 250px;">
+        <h3>Your Task Summary</h3>
+        <div style="width: 220px; height: 220px;">
+            <canvas id="taskChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Profile Info -->
+    <div style="flex: 1; min-width: 250px; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 6px rgba(0,0,0,0.1);">
+        <h3>Profile</h3>
+        <p><strong>Username:</strong> {{ user.username }}</p>
+        <p><strong>Role:</strong> {{ user.role }}</p>
+        <p><strong>Department:</strong> {{ user.department }}</p>
+        <p><strong>ID Card No:</strong> {{ user.id_card }}</p>
+        <a href="/profile/edit" style="color: #2980b9;">Edit Profile</a>
+    </div>
+</div>
+
+<!-- All Tasks Table -->
+<br><hr><br>
+<h3>All Entered Tasks</h3>
+<table cellpadding="10" style="width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden;">
+    <thead>
+        <tr style="background-color: #2c3e50; color: white;">
+            <th>Date</th>
+            <th>Task ID</th>
+            <th>Description</th>
+            <th>Client</th>
+            <th>Location</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% set current_date = None %}
+        {% set shade_toggle = false %}
+        {% for task in all_tasks %}
+            {% if task.date != current_date %}
+                {% set current_date = task.date %}
+                {% set shade_toggle = not shade_toggle %}
+            {% endif %}
+            <tr style="background-color: {{ '#f4f9ff' if shade_toggle else '#ffffff' }};">
+                <td>{{ task.date }}</td>
+                <td>{{ task.task_id }}</td>
+                <td>{{ task.description }}</td>
+                <td>{{ task.client }}</td>
+                <td>{{ task.location }}</td>
+                <td>{{ task.status }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+
+<!-- Chart.js Pie -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('taskChart').getContext('2d');
+    const taskChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Completed', 'Pending'],
+            datasets: [{
+                data: [{{ completed }}, {{ pending }}],
+                backgroundColor: ['#27ae60', '#e67e22']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
+        }
+    });
+</script>
+
+<script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('{{ url_for('static', filename='service-worker.js') }}')
+          .then(reg => console.log("✅ Service Worker registered."))
+          .catch(err => console.error("❌ Service Worker registration failed:", err));
+      }
+    </script>

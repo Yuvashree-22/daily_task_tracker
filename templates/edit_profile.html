@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
+    <title>Edit Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background-color: #f4f6f7;
+        }
+        form {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 500px;
+            margin: auto;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            margin-top: 25px;
+            padding: 10px 20px;
+            background-color: #2c3e50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #1abc9c;
+        }
+    </style>
+</head>
+<body>
+    <h2 style="text-align: center;">Edit Profile</h2>
+    <form method="POST" enctype="multipart/form-data">
+        <label>New Password:</label>
+        <input type="password" name="password">
+
+        <label>Upload New Photo:</label>
+        <input type="file" name="photo">
+
+        <label>Role:</label>
+        <input type="text" name="role" value="{{ user.role or '' }}">
+
+        <label>Department:</label>
+        <select name="department" required>
+            <option value="">-- Select Department --</option>
+            <option value="IT" {% if user.department == 'IT' %}selected{% endif %}>IT</option>
+            <option value="HR" {% if user.department == 'HR' %}selected{% endif %}>HR</option>
+            <option value="Finance" {% if user.department == 'Finance' %}selected{% endif %}>Finance</option>
+            <option value="Marketing" {% if user.department == 'Marketing' %}selected{% endif %}>Marketing</option>
+            <option value="Admin" {% if user.department == 'Admin' %}selected{% endif %}>Admin</option>
+        </select>
+
+        <label>ID Card Number:</label>
+        <input type="text" name="id_card" value="{{ user.id_card or '' }}">
+
+        <button type="submit">Save Changes</button>
+    </form>
+</body>
+</html>

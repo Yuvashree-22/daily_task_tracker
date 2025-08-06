@@ -1,0 +1,94 @@
+<!-- templates/task_view.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
+    <title>{{ title }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        th {
+            background-color: #34495e;
+            color: white;
+            padding: 12px;
+            text-align: left;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        .Pending {
+            background-color: #f1c40f;
+            color: #fff;
+        }
+
+        .Completed {
+            background-color: #2ecc71;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <h2>{{ title }}</h2>
+
+    {% if tasks %}
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Task ID</th>
+            <th>Description</th>
+            <th>Client / Site</th>
+            <th>Location</th>
+            <th>Status</th>
+        </tr>
+        {% for task in tasks %}
+        <tr>
+            <td>{{ task.date }}</td>
+            <td>{{ task.task_id }}</td>
+            <td>{{ task.description }}</td>
+            <td>{{ task.client }}</td>
+            <td>{{ task.location }}</td>
+            <td><span class="status {{ task.status }}">{{ task.status }}</span></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <p>No {{ title.lower() }} available.</p>
+    {% endif %}
+</body>
+</html>

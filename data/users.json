@@ -1,0 +1,34 @@
+[
+  {
+    "username": "Yuvashree",
+    "password": "yuva@rf",
+    "role": "Network and Cybersecurity Analyst",
+    "department": "IT",
+    "id_card": "RFISPL074",
+    "photo": "static/uploads\\IMG-20250407-WA0007.jpg"
+  },
+  {
+    "username": "Malavi",
+    "password": "mala@rf",
+    "role": "Network and Cybersecurity Analyst",
+    "department": "IT",
+    "id_card": "RFISPL072",
+    "photo": "static/uploads\\IMG-20250407-WA0006.jpg"
+  },
+  {
+    "username": "Yuvana",
+    "password": "yuvana",
+    "role": "Network engineer ",
+    "department": "IT",
+    "id_card": "Rfispl074",
+    "photo": "static/uploads\\20250804_94835AMByGPSMapCamera.jpg"
+  },
+  {
+    "username": "admin",
+    "password": "admin",
+    "role": "Network and Cybersecurity Analyst",
+    "department": "IT",
+    "id_card": "RFISPL077",
+    "photo": "static/uploads\\unnamed.png"
+  }
+]

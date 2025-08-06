@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="theme-color" content="#2c3e50">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
+    <title>Enter Today's Task</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            min-height: 100vh;
+            background-color: #f8f9fa;
+        }
+
+        .sidebar {
+            width: 220px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .sidebar h3 {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .sidebar hr {
+            width: 100%;
+            border: 0.5px solid white;
+            margin: 20px 0;
+        }
+
+        .sidebar button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #34495e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .sidebar button:hover {
+            background-color: #3d566e;
+        }
+
+        .sidebar .logout {
+            background-color: #c0392b;
+        }
+
+        .main-content {
+            flex-grow: 1;
+            padding: 40px;
+        }
+
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+        }
+
+        .task-block {
+            background-color: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: 500;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .button-group {
+            margin-top: 20px;
+        }
+
+        .button-group button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            background-color: #34495e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button-group button:hover {
+            background-color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <h2>Enter Today's Task</h2>
+
+        <form method="POST" action="/task/entry">
+            <div id="task-container">
+                <div class="task-block">
+                    <label>Task ID:</label>
+                    <input type="text" name="task_id" class="task-id" required>
+
+                    <label>Date:</label>
+                    <input type="date" name="date" id="dateInput" required>
+
+                    <label>Description:</label>
+                    <input type="text" name="description" required>
+
+                    <label>Site / Client:</label>
+                    <input type="text" name="client" required>
+
+                    <label>Where are you going today?</label>
+                    <input type="text" name="location" required>
+
+                    <label>Status:</label>
+                    <select name="status" required>
+                        <option value="Pending">Pending</option>
+                        <option value="Completed">Completed</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <button type="button" onclick="addTask()">+ Add More Task</button>
+                <button type="submit">Submit Tasks</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function addTask() {
+            const container = document.getElementById("task-container");
+            const taskBlock = container.querySelector(".task-block").cloneNode(true);
+
+            taskBlock.querySelectorAll("input").forEach(input => input.value = '');
+            taskBlock.querySelector("select").value = 'Pending';
+
+            container.appendChild(taskBlock);
+        }
+    </script>
+
+    <script>
+    // Set default date to today
+    window.onload = function () {
+        const today = new Date().toISOString().split('T')[0];
+        document.querySelectorAll('input[type="date"]').forEach(function(dateField) {
+            if (!dateField.value) {
+                dateField.value = today;
+            }
+        });
+    };
+</script>
+<script>
+    let taskCount = 1;
+
+    // Auto-fill first task on page load
+    window.onload = function () {
+        const today = new Date().toISOString().split('T')[0];
+        document.querySelector('input[type="date"]').value = today;
+        document.querySelector('.task-id').value = taskCount;
+    };
+
+    function addTask() {
+        const container = document.getElementById("task-container");
+        const taskBlock = container.querySelector(".task-block").cloneNode(true);
+
+        // Clear previous inputs
+        taskBlock.querySelectorAll("input").forEach(input => input.value = '');
+        taskBlock.querySelector("select").value = 'Pending';
+
+        // Auto-increment task ID and date
+        taskCount += 1;
+        taskBlock.querySelector(".task-id").value = taskCount;
+        taskBlock.querySelector('input[type="date"]').value = new Date().toISOString().split('T')[0];
+
+        container.appendChild(taskBlock);
+    }
+</script>
+</body>
+</html>
