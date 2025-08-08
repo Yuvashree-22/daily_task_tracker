@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>User Dashboard</title>
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <meta name="theme-color" content="#2c3e50">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='icons/icon-192x192.png') }}">
-    <title>User Dashboard</title>
     <style>
+        * { box-sizing: border-box; }
+
         body {
             margin: 0;
             font-family: Arial, sans-serif;
+            background-color: #f4f6f7;
         }
 
         .container {
@@ -21,14 +24,17 @@
             background-color: #2c3e50;
             color: white;
             padding: 20px;
-            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
         }
 
         .sidebar img {
             width: 80px;
             height: 80px;
             border-radius: 50%;
-            margin-bottom: 10px;
         }
 
         .sidebar div {
@@ -44,26 +50,26 @@
             background-color: #34495e;
             border: none;
             color: white;
-            cursor: pointer;
             text-align: left;
             border-radius: 4px;
             font-size: 15px;
+            cursor: pointer;
         }
 
         .sidebar button:hover {
             background-color: #1abc9c;
         }
 
-        .main-content {
+        #main-content {
+            margin-left: 220px;
+            padding: 30px;
             flex: 1;
-            padding: 0;
-            background-color: #f4f6f7;
         }
 
-        iframe {
+        #installBtn {
+            margin-top: 10px;
             width: 100%;
-            height: 100vh;
-            border: none;
+            background-color: #2980b9;
         }
     </style>
 </head>
@@ -82,56 +88,58 @@
             <button onclick="loadPage('/task/completed')">Completed Tasks</button>
             <button onclick="loadPage('/task/history')">View Previous Tasks</button>
             <button onclick="window.location.href='/logout'" style="background-color: #c0392b;">Logout</button>
-            <button id="installBtn" style="display:none;">Install App</button>
+            <button id="installBtn" style="display: none;">Install App</button>
         </div>
 
         <!-- Main Content Area -->
-        <div class="main-content">
-            <!-- Replace iframe with a div and load templates via Flask routes -->
+        <div id="main-content">
+            <!-- Dynamic content will be loaded here -->
         </div>
     </div>
 
+    <!-- Script to load content dynamically -->
     <script>
         function loadPage(url) {
-            document.getElementById("contentFrame").src = url;
+            fetch(url)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById("main-content").innerHTML = html;
+                    window.scrollTo(0, 0); // scroll to top on load
+                })
+                .catch(err => console.error('Error loading page:', err));
         }
 
-        // Load Home page by default
+        // Load Home by default
         window.onload = function () {
             loadPage('/dashboard/home');
         };
     </script>
 
-    <!-- Register Service Worker -->
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/static/service-worker.js')
-      .then(reg => console.log('Service Worker Registered'))
-      .catch(err => console.error('Service Worker registration failed:', err));
-  }
-</script>
+    <!-- PWA support -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/static/service-worker.js')
+          .then(() => console.log('Service Worker Registered'));
+      }
 
-<script>
-  let deferredPrompt;
-  const installBtn = document.getElementById('installBtn');
+      let deferredPrompt;
+      const installBtn = document.getElementById('installBtn');
 
-  window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    installBtn.style.display = 'inline-block';
-  });
-
-  installBtn.addEventListener('click', () => {
-    if (deferredPrompt) {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(choice => {
-        if (choice.outcome === 'accepted') {
-          console.log('App installed');
-        }
-        deferredPrompt = null;
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        installBtn.style.display = 'block';
       });
-    }
-  });
-</script>
+
+      installBtn.addEventListener('click', () => {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(choice => {
+          if (choice.outcome === 'accepted') {
+            console.log('App installed');
+          }
+          deferredPrompt = null;
+        });
+      });
+    </script>
 </body>
 </html>

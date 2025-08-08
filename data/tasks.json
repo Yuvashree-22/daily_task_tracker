@@ -37,18 +37,9 @@
   },
   {
     "username": "Yuvashree",
-    "task_id": "2",
-    "description": "l&t mindtree haii",
-    "client": "data center adani",
-    "location": "L & T",
-    "date": "2025-08-01",
-    "status": "Completed"
-  },
-  {
-    "username": "Yuvashree",
     "task_id": "1",
     "description": "Network monitoring dashboard",
-    "client": "RF info",
+    "client": "RF info syatems",
     "location": "office only",
     "date": "2025-08-01",
     "status": "Completed"
