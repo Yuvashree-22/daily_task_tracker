@@ -218,38 +218,28 @@ def view_history():
 
 @app.route('/task/update/<int:index>', methods=['POST'])
 def update_task(index):
-    if 'username' not in session:
-        return redirect(url_for('login'))
+    tasks = load_tasks()  # however you're loading tasks
+    if index >= len(tasks):
+        return 'Task not found', 404
 
-    tasks = load_tasks()
-    user_tasks = [t for t in tasks if t['username'] == session['username']]
-    if index < len(user_tasks):
-        task = user_tasks[index]
-        real_index = tasks.index(task)
-        tasks[real_index].update({
-            'task_id': request.form['task_id'],
-            'description': request.form['description'],
-            'client': request.form['client'],
-            'date': request.form['date'],
-            'status': request.form['status']
-        })
-        save_tasks(tasks)
-        flash("Task updated.")
-    return redirect(url_for('view_history'))
+    data = request.get_json()
+    tasks[index]['task_id'] = data['task_id']
+    tasks[index]['date'] = data['date']
+    tasks[index]['description'] = data['description']
+    tasks[index]['client'] = data['client']
+    tasks[index]['status'] = data['status']
+    
+    save_tasks(tasks)
+    return '', 204
 
-@app.route('/task/delete/<int:index>')
+@app.route('/task/delete/<int:index>', methods=['POST'])
 def delete_task(index):
-    if 'username' not in session:
-        return redirect(url_for('login'))
-
     tasks = load_tasks()
-    user_tasks = [t for t in tasks if t['username'] == session['username']]
-    if index < len(user_tasks):
-        task_to_delete = user_tasks[index]
-        tasks.remove(task_to_delete)
-        save_tasks(tasks)
-        flash("Task deleted.")
-    return redirect(url_for('view_history'))
+    if index >= len(tasks):
+        return 'Task not found', 404
+    tasks.pop(index)
+    save_tasks(tasks)
+    return '', 204
 
 # --- Boss Routes ---
 @app.route('/boss/signup', methods=['GET', 'POST'])

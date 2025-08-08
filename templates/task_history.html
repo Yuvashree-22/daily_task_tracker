@@ -135,7 +135,7 @@
         </tr>
         {% for task in tasks %}
         <tr>
-            <form method="POST" action="/task/update/{{ loop.index0 }}">
+            
                 <td><input name="task_id" value="{{ task.task_id }}"></td>
                 <td><input name="date" type="date" value="{{ task.date }}"></td>
                 <td><input name="description" value="{{ task.description }}"></td>
@@ -147,8 +147,8 @@
                     </select>
                 </td>
                 <td class="action-btns">
-                    <button type="submit">Update</button>
-                    <a href="/task/delete/{{ loop.index0 }}" onclick="return confirm('Are you sure?')">Delete</a>
+                    <button type="button" class="update-btn" data-id="{{ loop.index0 }}">Update</button>
+                    <button type="button" class="delete-btn" data-id="{{ loop.index0 }}">Delete</button>
                 </td>
             </form>
         </tr>
@@ -169,3 +169,46 @@
         // Trigger once on page load
         toggleFilterInput();
     </script>
+
+    <script>
+    document.addEventListener('click', async function (e) {
+        // Handle Delete
+        if (e.target.classList.contains('delete-btn')) {
+            const taskId = e.target.dataset.id;
+            if (confirm("Are you sure you want to delete this task?")) {
+                const res = await fetch(`/task/delete/${taskId}`, {
+                    method: 'POST',
+                });
+                if (res.ok) {
+                    alert("Task deleted!");
+                    loadPage('/task/history');  // Refresh view
+                }
+            }
+        }
+
+        // Handle Update
+        if (e.target.classList.contains('update-btn')) {
+            const row = e.target.closest('tr');
+            const taskId = e.target.dataset.id;
+
+            const data = {
+                task_id: row.querySelector('[name="task_id"]').value,
+                date: row.querySelector('[name="date"]').value,
+                description: row.querySelector('[name="description"]').value,
+                client: row.querySelector('[name="client"]').value,
+                status: row.querySelector('[name="status"]').value
+            };
+
+            const res = await fetch(`/task/update/${taskId}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+
+            if (res.ok) {
+                alert("Task updated!");
+                loadPage('/task/history');
+            }
+        }
+    });
+</script>
